@@ -1,0 +1,693 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Centrales Termoeléctricas de Guayaquil</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Calibri, Arial, sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: #333;
+            overflow-x: hidden;
+        }
+
+        .presentation-container {
+            width: 100vw;
+            height: 100vh;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .slide {
+            width: 90vw;
+            max-width: 1200px;
+            height: 675px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+            padding: 40px;
+            display: none;
+            flex-direction: column;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .slide.active {
+            display: flex;
+        }
+
+        .slide::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 6px;
+            background: linear-gradient(90deg, #1e3c72 0%, #2a5298 50%, #3b82f6 100%);
+        }
+
+        .slide-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .slide-title {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #1e3c72;
+            margin-bottom: 15px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .slide-subtitle {
+            font-size: 1.3rem;
+            color: #5a6c7d;
+            font-weight: 300;
+        }
+
+        .slide-content {
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .content-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            height: 100%;
+        }
+
+        .content-single {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .content-list {
+            list-style: none;
+        }
+
+        .content-list li {
+            padding: 12px 0;
+            font-size: 1.1rem;
+            line-height: 1.6;
+            border-bottom: 1px solid #e2e8f0;
+            position: relative;
+            padding-left: 25px;
+        }
+
+        .content-list li::before {
+            content: '▶';
+            position: absolute;
+            left: 0;
+            color: #3b82f6;
+            font-size: 0.8rem;
+        }
+
+        .table-container {
+            overflow-x: auto;
+            margin: 20px 0;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .data-table th {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        .data-table td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .data-table tr:nth-child(even) {
+            background: #f8fafc;
+        }
+
+        .highlight-box {
+            background: linear-gradient(135deg, #3b82f6 0%, #1e40af 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 12px;
+            margin: 20px 0;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+        }
+
+        .highlight-number {
+            font-size: 3rem;
+            font-weight: bold;
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        .navigation {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 15px;
+            z-index: 1000;
+        }
+
+        .nav-btn {
+            padding: 12px 24px;
+            background: rgba(30, 60, 114, 0.9);
+            color: white;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .nav-btn:hover {
+            background: rgba(42, 82, 152, 1);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+
+        .nav-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .slide-counter {
+            position: absolute;
+            top: 15px;
+            right: 25px;
+            background: rgba(30, 60, 114, 0.1);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            color: #1e3c72;
+            font-weight: 600;
+        }
+
+        .cover-slide {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            text-align: center;
+            justify-content: center;
+        }
+
+        .cover-slide .slide-title {
+            color: white;
+            font-size: 3rem;
+            margin-bottom: 25px;
+            text-shadow: 0 4px 8px rgba(0,0,0,0.3);
+        }
+
+        .cover-slide .slide-subtitle {
+            color: rgba(255,255,255,0.9);
+            font-size: 1.5rem;
+            margin-bottom: 40px;
+        }
+
+        .author-info {
+            position: absolute;
+            bottom: 60px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 1.2rem;
+            opacity: 0.8;
+        }
+
+        .chart-container {
+            background: #f8fafc;
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .progress-bar {
+            background: #e2e8f0;
+            height: 8px;
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 15px 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #3b82f6 0%, #1e40af 100%);
+            border-radius: 4px;
+            transition: width 0.3s ease;
+        }
+
+        .icon {
+            display: inline-block;
+            width: 24px;
+            height: 24px;
+            margin-right: 10px;
+            vertical-align: middle;
+        }
+    </style>
+</head>
+<body>
+    <div class="presentation-container">
+        <div class="slide-counter">
+            <span id="currentSlide">1</span> / <span id="totalSlides">15</span>
+        </div>
+
+        <!-- Slide 1: Portada -->
+        <div class="slide cover-slide active">
+            <h1 class="slide-title">Centrales Termoeléctricas de Guayaquil y el Programa de Recuperación de Potencia CELEC EP</h1>
+            <p class="slide-subtitle">Análisis de Proyectos en 2025</p>
+            <div class="author-info">
+                <strong>Por: Elkis Zabala</strong>
+            </div>
+        </div>
+
+        <!-- Slide 2: Introducción -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Introducción</h2>
+            </div>
+            <div class="slide-content content-single">
+                <ul class="content-list">
+                    <li><strong>Objetivo del programa de recuperación de potencia:</strong> Fortalecer la matriz energética nacional mediante la reactivación y modernización de centrales termoeléctricas estratégicas</li>
+                    <li><strong>Importancia de la energía termoeléctrica en Guayaquil:</strong> Garantizar el suministro eléctrico continuo y confiable para la región más poblada del país</li>
+                    <li><strong>Contexto actual:</strong> Respuesta a los desafíos energéticos causados por fenómenos climáticos y alta demanda energética</li>
+                    <li><strong>Alcance del programa:</strong> Recuperación de más de 500 MW de capacidad instalada en la región</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Slide 3: Contexto Energético en Ecuador -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Contexto Energético en Ecuador</h2>
+            </div>
+            <div class="slide-content">
+                <div class="content-grid">
+                    <div>
+                        <h3 style="color: #1e3c72; margin-bottom: 20px;">Situación Actual</h3>
+                        <ul class="content-list">
+                            <li>Dependencia del 70% en generación hidroeléctrica</li>
+                            <li>Vulnerabilidad ante fenómenos climáticos</li>
+                            <li>Necesidad de diversificación energética</li>
+                            <li>Crecimiento sostenido de la demanda</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h3 style="color: #1e3c72; margin-bottom: 20px;">Problemas Recientes</h3>
+                        <ul class="content-list">
+                            <li>Estiaje severo en 2023-2024</li>
+                            <li>Apagones programados y emergencias</li>
+                            <li>Pérdida de confiabilidad del sistema</li>
+                            <li>Impacto económico significativo</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 4: Centrales Termoeléctricas de Guayaquil -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Centrales Termoeléctricas de Guayaquil</h2>
+            </div>
+            <div class="slide-content">
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Central</th>
+                                <th>Provincia</th>
+                                <th>Potencia (MW)</th>
+                                <th>Estado Actual</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Enrique García</strong></td>
+                                <td>Guayas</td>
+                                <td>96</td>
+                                <td>En reactivación</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Pascuales II</strong></td>
+                                <td>Guayas</td>
+                                <td>80-136</td>
+                                <td>Contratación temporal</td>
+                            </tr>
+                            <tr>
+                                <td><strong>El Salitral</strong></td>
+                                <td>Guayas</td>
+                                <td>100</td>
+                                <td>Instalación en curso</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Álvaro Tinajero</strong></td>
+                                <td>Guayas</td>
+                                <td>35</td>
+                                <td>Mantenimiento</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Aníbal Santos</strong></td>
+                                <td>Guayas</td>
+                                <td>35</td>
+                                <td>Recuperación</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 5: Central Enrique García -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Central Enrique García</h2>
+            </div>
+            <div class="slide-content">
+                <div class="content-grid">
+                    <div>
+                        <h3 style="color: #1e3c72; margin-bottom: 20px;">Características Técnicas</h3>
+                        <ul class="content-list">
+                            <li><strong>Ubicación:</strong> Guayaquil, Guayas</li>
+                            <li><strong>Tecnología:</strong> Turbina a gas</li>
+                            <li><strong>Combustible:</strong> Gas natural y diesel</li>
+                            <li><strong>Año de construcción:</strong> 1987</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <div class="highlight-box">
+                            <span class="highlight-number">96</span>
+                            <strong>MW de Capacidad</strong>
+                            <p style="margin-top: 15px;">Reactivación programada para 2025</p>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 75%;"></div>
+                        </div>
+                        <p style="text-align: center; margin-top: 10px;"><strong>Progreso: 75%</strong></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 6: Central Pascuales II -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Central Pascuales II</h2>
+            </div>
+            <div class="slide-content">
+                <div class="content-grid">
+                    <div>
+                        <h3 style="color: #1e3c72; margin-bottom: 20px;">Especificaciones</h3>
+                        <ul class="content-list">
+                            <li><strong>Capacidad variable:</strong> 80 - 136 MW</li>
+                            <li><strong>Modalidad:</strong> Generación temporal</li>
+                            <li><strong>Proceso:</strong> Contratación en curso</li>
+                            <li><strong>Plazo estimado:</strong> 6-12 meses</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <div class="chart-container">
+                            <h4 style="color: #1e3c72; margin-bottom: 15px;">Capacidad de Generación</h4>
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin: 20px 0;">
+                                <div style="text-align: center;">
+                                    <div style="font-size: 2rem; font-weight: bold; color: #3b82f6;">80</div>
+                                    <div>MW Mínimo</div>
+                                </div>
+                                <div style="text-align: center;">
+                                    <div style="font-size: 2rem; font-weight: bold; color: #1e40af;">136</div>
+                                    <div>MW Máximo</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 7: Central El Salitral -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Central El Salitral</h2>
+            </div>
+            <div class="slide-content">
+                <div class="content-grid">
+                    <div>
+                        <h3 style="color: #1e3c72; margin-bottom: 20px;">Estado del Proyecto</h3>
+                        <ul class="content-list">
+                            <li><strong>Instalación de 100 MW</strong> de nueva capacidad</li>
+                            <li><strong>Avances significativos</strong> en infraestructura</li>
+                            <li><strong>Pruebas en curso</strong> de equipos principales</li>
+                            <li><strong>Fecha esperada:</strong> Segundo semestre 2025</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <div class="highlight-box">
+                            <span class="highlight-number">100</span>
+                            <strong>MW Nuevos</strong>
+                            <p style="margin-top: 15px;">Tecnología de última generación</p>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 60%;"></div>
+                        </div>
+                        <p style="text-align: center; margin-top: 10px;"><strong>Avance: 60%</strong></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 8: Centrales Álvaro Tinajero y Aníbal Santos -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Centrales Álvaro Tinajero y Aníbal Santos</h2>
+            </div>
+            <div class="slide-content">
+                <div class="content-grid">
+                    <div>
+                        <h3 style="color: #1e3c72; margin-bottom: 20px;">Álvaro Tinajero</h3>
+                        <ul class="content-list">
+                            <li><strong>Capacidad:</strong> 35 MW</li>
+                            <li><strong>Estado:</strong> Mantenimiento mayor</li>
+                            <li><strong>Inversión:</strong> $8.5 millones</li>
+                            <li><strong>Fecha prevista:</strong> Marzo 2025</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h3 style="color: #1e3c72; margin-bottom: 20px;">Aníbal Santos</h3>
+                        <ul class="content-list">
+                            <li><strong>Capacidad:</strong> 35 MW</li>
+                            <li><strong>Estado:</strong> Proceso de recuperación</li>
+                            <li><strong>Inversión:</strong> $7.2 millones</li>
+                            <li><strong>Fecha prevista:</strong> Abril 2025</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="highlight-box" style="margin-top: 20px;">
+                    <span class="highlight-number">70</span>
+                    <strong>MW Capacidad Combinada</strong>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 9: Programa de Recuperación de Potencia CELEC EP -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Programa de Recuperación de Potencia CELEC EP</h2>
+            </div>
+            <div class="slide-content">
+                <div class="content-grid">
+                    <div>
+                        <h3 style="color: #1e3c72; margin-bottom: 20px;">Objetivos Clave</h3>
+                        <ul class="content-list">
+                            <li>Incrementar la confiabilidad del sistema eléctrico</li>
+                            <li>Reducir la dependencia hidroeléctrica</li>
+                            <li>Mejorar la seguridad energética nacional</li>
+                            <li>Optimizar costos operativos</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h3 style="color: #1e3c72; margin-bottom: 20px;">Plan de Acción</h3>
+                        <ul class="content-list">
+                            <li><strong>Financiamiento:</strong> $150 millones aprobados</li>
+                            <li><strong>Cronograma:</strong> 2025-2026</li>
+                            <li><strong>Supervisión:</strong> Directa por CELEC EP</li>
+                            <li><strong>Coordinación:</strong> Con operadores privados</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 10: Acciones Clave del Programa -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Acciones Clave del Programa</h2>
+            </div>
+            <div class="slide-content content-single">
+                <ul class="content-list">
+                    <li><strong>Reactivación de unidades térmicas:</strong> Puesta en operación de centrales históricamente importantes para el sistema</li>
+                    <li><strong>Mantenimiento y modernización:</strong> Actualización tecnológica de equipos existentes para optimizar eficiencia</li>
+                    <li><strong>Alquiler de generación temporal:</strong> Contratación de 260 MW adicionales en Pascuales para respaldo inmediato</li>
+                    <li><strong>Mejoras en infraestructura:</strong> Adecuación de sistemas de transmisión y distribución</li>
+                    <li><strong>Capacitación técnica:</strong> Formación especializada para personal operativo</li>
+                    <li><strong>Monitoreo continuo:</strong> Implementación de sistemas de supervisión en tiempo real</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Slide 11: Impacto en el Sistema Energético -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Impacto en el Sistema Energético</h2>
+            </div>
+            <div class="slide-content">
+                <div class="content-grid">
+                    <div>
+                        <h3 style="color: #1e3c72; margin-bottom: 20px;">Beneficios Directos</h3>
+                        <ul class="content-list">
+                            <li>Mayor estabilidad del suministro eléctrico</li>
+                            <li>Reducción significativa de cortes programados</li>
+                            <li>Menor vulnerabilidad ante eventos climáticos</li>
+                            <li>Mejora en la calidad del servicio</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h3 style="color: #1e3c72; margin-bottom: 20px;">Impacto Cuantificado</h3>
+                        <div class="chart-container">
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; text-align: center;">
+                                <div>
+                                    <div style="font-size: 2.5rem; font-weight: bold; color: #3b82f6;">-85%</div>
+                                    <div>Reducción de apagones</div>
+                                </div>
+                                <div>
+                                    <div style="font-size: 2.5rem; font-weight: bold; color: #1e40af;">+40%</div>
+                                    <div>Incremento de confiabilidad</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 12: CELEC Electroguayas -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">CELEC Electroguayas</h2>
+            </div>
+            <div class="slide-content">
+                <div class="content-grid">
+                    <div>
+                        <h3 style="color: #1e3c72; margin-bottom: 20px;">Funciones y Responsabilidades</h3>
+                        <ul class="content-list">
+                            <li>Operación y mantenimiento de centrales térmicas</li>
+                            <li>Coordinación con el Sistema Nacional Interconectado</li>
+                            <li>Gestión de contratos de generación temporal</li>
+                            <li>Supervisión técnica de proyectos</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h3 style="color: #1e3c72; margin-bottom: 20px;">Proyectos Recientes en Guayaquil</h3>
+                        <ul class="content-list">
+                            <li>Modernización de sistemas de control</li>
+                            <li>Implementación de tecnologías eficientes</li>
+                            <li>Programas de capacitación técnica</li>
+                            <li>Auditorías energéticas especializadas</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 13: Desafíos y Oportunidades -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Desafíos y Oportunidades</h2>
+            </div>
+            <div class="slide-content">
+                <div class="content-grid">
+                    <div>
+                        <h3 style="color: #1e3c72; margin-bottom: 20px;">Desafíos</h3>
+                        <ul class="content-list">
+                            <li>Financiamiento a largo plazo</li>
+                            <li>Obsolescencia tecnológica</li>
+                            <li>Competencia con energías renovables</li>
+                            <li>Regulaciones ambientales</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h3 style="color: #1e3c72; margin-bottom: 20px;">Oportunidades</h3>
+                        <ul class="content-list">
+                            <li>Inversión en energía renovable híbrida</li>
+                            <li>Expansión de infraestructura termoeléctrica</li>
+                            <li>Desarrollo de tecnologías limpias</li>
+                            <li>Integración con sistemas inteligentes</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 14: Conclusiones -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Conclusiones</h2>
+            </div>
+            <div class="slide-content content-single">
+                <ul class="content-list">
+                    <li><strong>Impacto transformador:</strong> El programa representa un cambio fundamental en la estrategia energética nacional, fortaleciendo la matriz de generación</li>
+                    <li><strong>Resultados esperados:</strong> Incremento de más de 500 MW en capacidad instalada termoeléctrica para 2026</li>
+                    <li><strong>Beneficio económico:</strong> Reducción estimada del 60% en costos por interrupciones del servicio eléctrico</li>
+                    <li><strong>Sostenibilidad:</strong> Base sólida para futuras inversiones en tecnologías de generación avanzadas</li>
+                    <li><strong>Visión 2026:</strong> Ecuador como referente regional en diversificación y confiabilidad energética</li>
+                </ul>
+                <div class="highlight-box" style="margin-top: 30px;">
+                    <strong style="font-size: 1.3rem;">El programa marca el inicio de una nueva era energética para el Ecuador</strong>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 15: Referencias -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Referencias</h2>
+            </div>
+            <div class="slide-content">
+                <div class="content-grid">
+                    <div>
+                        <h3 style="color: #1e3c72; margin-bottom: 20px;">Documentos Oficiales CELEC EP</h3>
+                        <ul class="content-list">
+                            <li>Plan Estratégico 2025-2030</li>
+                            <li>Informe de Gestión Anual 2024</li>
+                            <li>Programa de Recuperación de Potencia</li>
+                            <li>Estudios Técnicos de Centrales</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h3 style="color: #1e3c72; margin-bottom: 20px;">Fuentes Especializadas</h3>
+                        <ul class="content-list">
+                            <li>Ministerio de Energía y Recursos Naturales No Renovables</li>
+                            <li>Operador Nacional de Electricidad (CENACE)</li>
+                            <li>Agencia de Regulación y Control de Electricidad (ARCONEL)</li>
+                            <li>Informes Técnicos Sectoriales 2024</li>
